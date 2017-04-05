@@ -15,6 +15,9 @@
 @property (nonatomic, assign) NSInteger selectIndex;
 @end
 
+// 下划线的高度
+static CGFloat   const WMProgressHeight = 2.0;
+static CGFloat   const WMMenuItemWidth  = 60.0;
 static NSInteger const WMMenuItemTagOffset  = 6250;
 static NSInteger const WMBadgeViewTagOffset = 1212;
 
@@ -129,7 +132,7 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
 
 - (UIColor *)lineColor {
     if (!_lineColor) {
-        _lineColor = [self colorForState:WMMenuItemStateSelected atIndex:0];
+        _lineColor = self.selectedColor;
     }
     return _lineColor;
 }
@@ -141,16 +144,30 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
     return _frames;
 }
 
-- (UIColor *)colorForState:(WMMenuItemState)state atIndex:(NSInteger)index {
-    if ([self.delegate respondsToSelector:@selector(menuView:titleColorForState:atIndex:)]) {
-        return [self.delegate menuView:self titleColorForState:state atIndex:index];
+- (UIColor *)selectedColor {
+    if ([self.delegate respondsToSelector:@selector(menuView:titleColorForState:)]) {
+        return [self.delegate menuView:self titleColorForState:WMMenuItemStateSelected];
     }
     return [UIColor blackColor];
 }
 
-- (CGFloat)sizeForState:(WMMenuItemState)state atIndex:(NSInteger)index {
-    if ([self.delegate respondsToSelector:@selector(menuView:titleSizeForState:atIndex:)]) {
-        return [self.delegate menuView:self titleSizeForState:state atIndex:index];
+- (UIColor *)normalColor {
+    if ([self.delegate respondsToSelector:@selector(menuView:titleColorForState:)]) {
+        return [self.delegate menuView:self titleColorForState:WMMenuItemStateNormal];
+    }
+    return [UIColor blackColor];
+}
+
+- (CGFloat)selectedSize {
+    if ([self.delegate respondsToSelector:@selector(menuView:titleSizeForState:)]) {
+        return [self.delegate menuView:self titleSizeForState:WMMenuItemStateSelected];
+    }
+    return 18.0;
+}
+
+- (CGFloat)normalSize {
+    if ([self.delegate respondsToSelector:@selector(menuView:titleSizeForState:)]) {
+        return [self.delegate menuView:self titleSizeForState:WMMenuItemStateNormal];
     }
     return 15.0;
 }
@@ -202,9 +219,9 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
     WMMenuItem *currentItem = (WMMenuItem *)[self viewWithTag:tag];
     WMMenuItem *nextItem = (WMMenuItem *)[self viewWithTag:tag+1];
     if (rate == 0.0) {
-        [self.selItem setSelected:NO withAnimation:NO];
+        [self.selItem deselectedWithoutAnimation];
         self.selItem = currentItem;
-        [self.selItem setSelected:YES withAnimation:NO];
+        [self.selItem selectedWithoutAnimation];
         [self refreshContenOffset];
         return;
     }
@@ -219,9 +236,9 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
     if (index == currentIndex || !self.selItem) { return; }
     
     WMMenuItem *item = (WMMenuItem *)[self viewWithTag:tag];
-    [self.selItem setSelected:NO withAnimation:NO];
+    [self.selItem deselectedWithoutAnimation];
     self.selItem = item;
-    [self.selItem setSelected:YES withAnimation:NO];
+    [self.selItem selectedWithoutAnimation];
     [self.progressView setProgressWithOutAnimate:index];
     if ([self.delegate respondsToSelector:@selector(menuView:didSelesctedIndex:currentIndex:)]) {
         [self.delegate menuView:self didSelesctedIndex:index currentIndex:currentIndex];
@@ -301,7 +318,14 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
 }
 
 - (void)resetFrames {
-    CGRect frame = self.bounds;
+//    self.bounds.origin.x
+    CGRect frame = CGRectMake(self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width - 40, self.bounds.size.height);
+    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [btn setImage:[UIImage imageNamed:@"moreButton"] forState:UIControlStateNormal];
+    btn.backgroundColor = [UIColor whiteColor];
+    btn.frame = CGRectMake(self.bounds.size.width - 40, 0, 40, self.bounds.size.height);
+    [btn addTarget:self action:@selector(moreBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:btn];
     if (self.rightView) {
         CGRect rightFrame = self.rightView.frame;
         rightFrame.origin.x = frame.size.width - rightFrame.size.width;
@@ -322,6 +346,12 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
     self.scrollView.frame = frame;
     [self resetFramesFromIndex:0];
 //    [self refreshContenOffset];
+}
+
+- (void)moreBtnClick:(UIButton *)sender {
+    if ([self.delegate respondsToSelector:@selector(menuViewDidTapMoreButton:)]) {
+        [self.delegate menuViewDidTapMoreButton:self];
+    }
 }
 
 - (void)resetFramesFromIndex:(NSInteger)index {
@@ -399,24 +429,26 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
     CGRect frame = CGRectZero;
     if (self.style == WMMenuViewStyleDefault) { return; }
     if (self.style == WMMenuViewStyleLine) {
-        self.progressHeight = self.progressHeight > 0 ? self.progressHeight : 2.0;
+        self.progressHeight = self.progressHeight > 0 ? self.progressHeight : WMProgressHeight;
         frame = CGRectMake(0, self.frame.size.height - self.progressHeight - self.progressViewBottomSpace, self.scrollView.contentSize.width, self.progressHeight);
     } else {
         self.progressHeight = self.progressHeight > 0 ? self.progressHeight : self.frame.size.height * 0.8;
         frame = CGRectMake(0, (self.frame.size.height - self.progressHeight) / 2, self.scrollView.contentSize.width, self.progressHeight);
         self.progressViewCornerRadius = self.progressViewCornerRadius > 0 ? self.progressViewCornerRadius : self.progressHeight / 2.0;
     }
-    [self addProgressViewWithFrame:frame
-                        isTriangle:(self.style == WMMenuViewStyleTriangle)
-                         hasBorder:(self.style == WMMenuViewStyleSegmented)
-                            hollow:(self.style == WMMenuViewStyleFloodHollow)
-                      cornerRadius:self.progressViewCornerRadius];
+    [self wm_addProgressViewWithFrame:frame
+                           isTriangle:(self.style == WMMenuViewStyleTriangle)
+                            hasBorder:(self.style == WMMenuViewStyleSegmented)
+                               hollow:(self.style == WMMenuViewStyleFloodHollow)
+                         cornerRadius:self.progressViewCornerRadius];
 }
 
 - (void)deselectedItemsIfNeeded {
     [self.scrollView.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        if (![obj isKindOfClass:[WMMenuItem class]] || obj == self.selItem) { return; }
-        [(WMMenuItem *)obj setSelected:NO withAnimation:NO];
+        if (![obj isKindOfClass:[WMMenuItem class]] || obj == self.selItem) {
+            return;
+        }
+        [(WMMenuItem *)obj deselectedWithoutAnimation];
     }];
 }
 
@@ -439,30 +471,30 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
     for (int i = 0; i < self.titlesCount; i++) {
         CGRect frame = [self.frames[i] CGRectValue];
         WMMenuItem *item = [[WMMenuItem alloc] initWithFrame:frame];
-        item.tag = (i + WMMenuItemTagOffset);
+        if (self.fontName) {
+            item.font = [UIFont fontWithName:self.fontName size:self.selectedSize];
+        } else {
+            item.font = [UIFont systemFontOfSize:self.selectedSize];
+        }
+        item.tag = (i+WMMenuItemTagOffset);
         item.delegate = self;
         item.text = [self.dataSource menuView:self titleAtIndex:i];
         item.textAlignment = NSTextAlignmentCenter;
-        item.userInteractionEnabled = YES;
-        item.backgroundColor = [UIColor clearColor];
-        item.normalSize    = [self sizeForState:WMMenuItemStateNormal atIndex:i];
-        item.selectedSize  = [self sizeForState:WMMenuItemStateSelected atIndex:i];
-        item.normalColor   = [self colorForState:WMMenuItemStateNormal atIndex:i];
-        item.selectedColor = [self colorForState:WMMenuItemStateSelected atIndex:i];
-        item.speedFactor   = self.speedFactor;
-        if (self.fontName) {
-            item.font = [UIFont fontWithName:self.fontName size:item.selectedSize];
-        } else {
-            item.font = [UIFont systemFontOfSize:item.selectedSize];
-        }
         if ([self.dataSource respondsToSelector:@selector(menuView:initialMenuItem:atIndex:)]) {
             item = [self.dataSource menuView:self initialMenuItem:item atIndex:i];
         }
+        item.userInteractionEnabled = YES;
+        item.backgroundColor = [UIColor clearColor];
+        item.normalSize    = self.normalSize;
+        item.selectedSize  = self.selectedSize;
+        item.normalColor   = self.normalColor;
+        item.selectedColor = self.selectedColor;
+        item.speedFactor   = self.speedFactor;
         if (i == 0) {
-            [item setSelected:YES withAnimation:NO];
+            [item selectedWithoutAnimation];
             self.selItem = item;
         } else {
-            [item setSelected:NO withAnimation:NO];
+            [item deselectedWithoutAnimation];
         }
         [self.scrollView addSubview:item];
     }
@@ -473,7 +505,7 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
 - (void)calculateItemFrames {
     CGFloat contentWidth = [self itemMarginAtIndex:0];
     for (int i = 0; i < self.titlesCount; i++) {
-        CGFloat itemW = 60.0;
+        CGFloat itemW = WMMenuItemWidth;
         if ([self.delegate respondsToSelector:@selector(menuView:widthForItemAtIndex:)]) {
             itemW = [self.delegate menuView:self widthForItemAtIndex:i];
         }
@@ -523,7 +555,7 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
 }
 
 // MARK:Progress View
-- (void)addProgressViewWithFrame:(CGRect)frame isTriangle:(BOOL)isTriangle hasBorder:(BOOL)hasBorder hollow:(BOOL)isHollow cornerRadius:(CGFloat)cornerRadius {
+- (void)wm_addProgressViewWithFrame:(CGRect)frame isTriangle:(BOOL)isTriangle hasBorder:(BOOL)hasBorder hollow:(BOOL)isHollow cornerRadius:(CGFloat)cornerRadius {
     WMProgressView *pView = [[WMProgressView alloc] initWithFrame:frame];
     pView.itemFrames = [self convertProgressWidthsToFrames];
     pView.color = self.lineColor.CGColor;
@@ -540,7 +572,7 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
 
 #pragma mark - Menu item delegate
 - (void)didPressedMenuItem:(WMMenuItem *)menuItem {
-    if (self.selItem == menuItem) { return; }
+    if (self.selItem == menuItem) return;
     
     CGFloat progress = menuItem.tag - WMMenuItemTagOffset;
     [self.progressView moveToPostion:progress];
@@ -550,8 +582,8 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
         [self.delegate menuView:self didSelesctedIndex:menuItem.tag-WMMenuItemTagOffset currentIndex:currentIndex];
     }
     
-    [menuItem setSelected:YES withAnimation:YES];
-    [self.selItem setSelected:NO withAnimation:YES];
+    menuItem.selected = YES;
+    self.selItem.selected = NO;
     self.selItem = menuItem;
     
     NSTimeInterval delay = self.style == WMMenuViewStyleDefault ? 0 : 0.3f;

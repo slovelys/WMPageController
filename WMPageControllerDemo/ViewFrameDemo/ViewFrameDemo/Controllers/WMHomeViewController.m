@@ -32,7 +32,7 @@
         self.menuViewStyle = WMMenuViewStyleLine;
         self.menuItemWidth = [UIScreen mainScreen].bounds.size.width / self.musicCategories.count;
         self.menuHeight = 50;
-        self.viewTop = kNavigationBarHeight + kWMHeaderViewHeight;
+//        self.viewTop = kNavigationBarHeight + kWMHeaderViewHeight;
         self.titleColorSelected = [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:1.0];
         self.titleColorNormal = [UIColor colorWithRed:0.4 green:0.8 blue:0.1 alpha:1.0];
     }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01CF2F7F1E94937100DA6E65 /* moreButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 01CF2F7E1E94937100DA6E65 /* moreButton@2x.png */; };
 		4D9BD00E1DFF992400E26206 /* WMPanGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9BD00D1DFF992400E26206 /* WMPanGestureRecognizer.m */; };
 		4DD02A0E1D46648400BCA5F1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD02A0D1D46648400BCA5F1 /* main.m */; };
 		4DD02A111D46648400BCA5F1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD02A101D46648400BCA5F1 /* AppDelegate.m */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		01CF2F7E1E94937100DA6E65 /* moreButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "moreButton@2x.png"; sourceTree = "<group>"; };
 		4D9BD00C1DFF992400E26206 /* WMPanGestureRecognizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WMPanGestureRecognizer.h; sourceTree = "<group>"; };
 		4D9BD00D1DFF992400E26206 /* WMPanGestureRecognizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WMPanGestureRecognizer.m; sourceTree = "<group>"; };
 		4DD02A091D46648400BCA5F1 /* ViewFrameDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ViewFrameDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -167,6 +169,7 @@
 		4DD02A4E1D46674E00BCA5F1 /* WMMenuView */ = {
 			isa = PBXGroup;
 			children = (
+				01CF2F7E1E94937100DA6E65 /* moreButton@2x.png */,
 				4DD02A511D46674E00BCA5F1 /* WMMenuItem.h */,
 				4DD02A521D46674E00BCA5F1 /* WMMenuItem.m */,
 				4DD02A531D46674E00BCA5F1 /* WMMenuView.h */,
@@ -261,6 +264,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DD02A1C1D46648400BCA5F1 /* LaunchScreen.storyboard in Resources */,
+				01CF2F7F1E94937100DA6E65 /* moreButton@2x.png in Resources */,
 				4DD02A191D46648400BCA5F1 /* Assets.xcassets in Resources */,
 				4DD02A171D46648400BCA5F1 /* Main.storyboard in Resources */,
 			);

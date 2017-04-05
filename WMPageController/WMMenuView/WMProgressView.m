@@ -43,6 +43,7 @@
     _step = _gap / self.speedFactor;
     if (_link) {
         [_link invalidate];
+//        [_link removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
     }
     CADisplayLink *link = [CADisplayLink displayLinkWithTarget:self selector:@selector(progressChanged)];
     [link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
@@ -140,6 +141,7 @@
         CGContextSetStrokeColorWithColor(ctx, self.color);
         CGContextStrokePath(ctx);
     }
+    
 }
 
 @end
