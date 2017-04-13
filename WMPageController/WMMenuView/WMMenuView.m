@@ -320,7 +320,7 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
 - (void)resetFrames {
 //    self.bounds.origin.x
     CGRect frame;
-    if (self.isNeedLoadMoreButton) {
+    if (self.isNeedUnfoldButton) {
         frame = CGRectMake(self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width - 40, self.bounds.size.height);
         UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
         [btn setImage:[UIImage imageNamed:@"moreButton"] forState:UIControlStateNormal];

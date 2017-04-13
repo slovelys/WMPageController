@@ -481,6 +481,7 @@ static NSInteger const kWMControllerCountUndefined = -1;
     menuView.delegate = self;
     menuView.dataSource = self;
     menuView.style = self.menuViewStyle;
+    menuView.isNeedUnfoldButton = self.isNeedUnfoldButton;
     menuView.layoutMode = self.menuViewLayoutMode;
     menuView.progressHeight = self.progressHeight;
     menuView.contentMargin = self.menuViewContentMargin;
