@@ -157,6 +157,9 @@ typedef NS_ENUM(NSUInteger, WMPageControllerPreloadPolicy) {
 /** Whether the controller can scroll. Default is YES. */
 @property (nonatomic, assign) BOOL scrollEnable;
 
+/** 是否需要加载更多的button，默认为 NO. */
+@property (nonatomic, assign) BOOL isNeedLoadMoreButton;
+
 /**
  *  选中时的标题尺寸
  *  The title size when selected (animatable)

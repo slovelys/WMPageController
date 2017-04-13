@@ -319,13 +319,19 @@ static NSInteger const WMBadgeViewTagOffset = 1212;
 
 - (void)resetFrames {
 //    self.bounds.origin.x
-    CGRect frame = CGRectMake(self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width - 40, self.bounds.size.height);
-    UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [btn setImage:[UIImage imageNamed:@"moreButton"] forState:UIControlStateNormal];
-    btn.backgroundColor = [UIColor whiteColor];
-    btn.frame = CGRectMake(self.bounds.size.width - 40, 0, 40, self.bounds.size.height);
-    [btn addTarget:self action:@selector(moreBtnClick:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:btn];
+    CGRect frame;
+    if (self.isNeedLoadMoreButton) {
+        frame = CGRectMake(self.bounds.origin.x, self.bounds.origin.y, self.bounds.size.width - 40, self.bounds.size.height);
+        UIButton *btn = [UIButton buttonWithType:UIButtonTypeCustom];
+        [btn setImage:[UIImage imageNamed:@"moreButton"] forState:UIControlStateNormal];
+        btn.backgroundColor = [UIColor whiteColor];
+        btn.frame = CGRectMake(self.bounds.size.width - 40, 0, 40, self.bounds.size.height);
+        [btn addTarget:self action:@selector(moreBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+        [self addSubview:btn];
+    } else {
+        frame = self.bounds;
+    }
+    
     if (self.rightView) {
         CGRect rightFrame = self.rightView.frame;
         rightFrame.origin.x = frame.size.width - rightFrame.size.width;
